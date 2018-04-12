@@ -95,20 +95,39 @@ String_copy proc, string1: ptr byte
 String_copy endp
 
 String_substring_1 proc, string1: ptr byte, beginIndex: dword, endIndex: dword
-	mov edx, endIndex		; memory to allocate is (endIndex - beginIndex) + 1 + 1
-	sub edx, beginIndex		; first +1 is to include both ends, second +1 is for NULL
-	add edx, 2
+	mov esi, string1		; esi = memory location of first char to copy
+	add esi, beginIndex
 
-	invoke memoryallocBailey, edx
+	mov ecx, endIndex		; memory to allocate is (endIndex - beginIndex) + 1 + 1
+	sub ecx, beginIndex		; first +1 is to include both ends, second +1 is for NULL
+	add ecx, 2
+	invoke memoryallocBailey, ecx
 
+	dec ecx					; ecx is now number of chars to copy
+SUBSTR_COPY_LOOP:
+	mov bl, byte ptr [esi + ecx - 1]	; get the character at position [ECX] in the input string
+	mov byte ptr [eax + ecx - 1], bl	; move that character into the same position in the substr
+	loop SUBSTR_COPY_LOOP				; repeat [ECX] times
+	
+	ret						; EAX contains the address of the new string
 String_substring_1 endp
 
-String_substring_2 proc
+String_substring_2 proc, string1: ptr byte, beginIndex: dword
+	push string1
+	call String_length
+	add esp, 4
+	mov edx, eax
 
+	push edx
+	push beginIndex
+	push string1
+	call String_substring_1
+	add esp, 12
+	ret
 String_substring_2 endp
 
 String_charAt proc
-
+	
 String_charAt endp
 
 String_startsWith_1 proc
