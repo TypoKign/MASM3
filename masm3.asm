@@ -3,9 +3,9 @@
 ;Program:	MASM3.asm
 ;Class:		CS3B
 ;Lab:		MASM2
-;Date:		March 29, 2018 at 11:59 PM
+;Date:		April 19, 2018 at 11:59 PM
 ;Purpose:
-;	Test the String1.asm library
+;	Use the String1 and String2 libraries
 ;*****************************************************************************
 
 .486
@@ -241,6 +241,9 @@ Menu endp
 
 
 _main:
+	push offset string1
+	call String_copy
+	mov dCopyAddress, eax
 	call Menu
 
 	invoke ExitProcess, 0

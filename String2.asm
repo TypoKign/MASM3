@@ -11,7 +11,7 @@
 .stack 100h
 
 ExitProcess PROTO Near32 stdcall, dVal:dword
-memoryallocBailey  proto Near32 stdcall, dNumBytes:dword
+memoryallocBailey	PROTO NEAR32 stdcall, dSize:dword
 
 	.data
 

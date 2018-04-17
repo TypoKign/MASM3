@@ -3,7 +3,7 @@
 ;Program:	String1.asm
 ;Class:		CS3B
 ;Lab:		MASM2
-;Date:		March 29, 2018 at 11:59 PM
+;Date:		April 19, 2018 at 11:59 PM
 ;Purpose:
 ;	Define String operations for MASM3
 ;*****************************************************************************
@@ -77,10 +77,11 @@ String_copy proc, string1: ptr byte
 	invoke memoryallocBailey, eax
 
 	mov esi, string1
-	.while byte ptr [esi] != 0	; for each character in the source string
-		mov bl, byte ptr [esi]	; get the character into a register
-		mov byte ptr [eax], bl	; move the character into the new memory location
-		inc esi					; go to the next character
+	mov ecx, 0
+	.while byte ptr [esi + ecx] != 0	; for each character in the source string
+		mov bl, byte ptr [esi + ecx]	; get the character into a register
+		mov byte ptr [eax + ecx], bl	; move the character into the new memory location
+		inc ecx							; go to next char
 	.endw
 
 	; memory address is already in EAX, ready to return
