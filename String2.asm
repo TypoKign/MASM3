@@ -93,6 +93,7 @@ String_lastIndexOf3 proc
 	pop ebp
 	ret	
 String_lastIndexOf3 endp
+@
 
 ;String_concat(string1:String,str:String):String  
 ;Concatenates the specified string “str” at the end of the string.
@@ -108,6 +109,7 @@ String_concat proc, string1: ptr byte, str2: ptr byte
 	add esp, 8			; clean up stack
 	add eax, ecx			; add the two string lengths
 	inc eax				; +1 for terminating null
+	mov edx, eax			; save length for memory adjustment
 	
 	invoke memoryallocBailey, eax	; allocate the calculated space on heap for new string
 	
@@ -127,10 +129,10 @@ String_concat proc, string1: ptr byte, str2: ptr byte
 		inc eax			; go to next char for new string
 	.endw
 	mov byte ptr [eax], 0		; append null to concatenated string
+	sub eax, edx			; move address in eax to beginning of string
 	
 	ret				; eax contains memory address of new string
 String_concat endp
-@
 
 ;String_replace(string1:String,oldChar:char,newChar:char):String  
 ;Returns new updated string after changing all the occurrences of oldChar with the newChar.
