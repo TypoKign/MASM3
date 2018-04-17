@@ -13,6 +13,8 @@
 ExitProcess PROTO Near32 stdcall, dVal:dword
 memoryallocBailey	PROTO NEAR32 stdcall, dSize:dword
 
+extern String_length: Near32
+
 	.data
 
 	.code

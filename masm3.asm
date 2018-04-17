@@ -241,10 +241,9 @@ Menu endp
 
 
 _main:
-	push offset string1
+	push 2
 	push offset string2
-	call String_equals
-	call String_equalsIgnoreCase
+	call String_charAt
 
 
 	invoke ExitProcess, 0
