@@ -58,7 +58,7 @@ strFalse			byte	"FALSE",0
 strNull				byte	"NULL",0
 strCurrently		byte	" currently:",0
 
-string1				byte	"NULL", 100 dup (0)
+string1				byte	"asdfNULL", 100 dup (0)
 string2				byte	"NULL", 100 dup (0)
 
 dLength				dword	0
@@ -241,10 +241,7 @@ Menu endp
 
 
 _main:
-	push 2
-	push offset string2
-	call String_charAt
-
+	call Menu
 
 	invoke ExitProcess, 0
 end _main

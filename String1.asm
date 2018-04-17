@@ -143,7 +143,7 @@ String_substring_2 endp
 String_charAt proc, string1: ptr byte, position: dword
 	push string1
 	call String_length	; have to check if the position is out of bounds, so we need length
-	add esp, 4
+	add esp, 8
 
 	.if position < 0 || position >= eax ; if the position is outside of [0, length)
 		mov eax, 0						; return NULL
@@ -152,20 +152,58 @@ String_charAt proc, string1: ptr byte, position: dword
 
 	mov esi, string1
 	mov eax, 0
-	mov al, byte ptr [esi + position] ; get the character at the specified position
+	mov edx, position
+	mov al, byte ptr [esi + edx] ; get the character at the specified position
 	ret
 String_charAt endp
 
-String_startsWith_1 proc
+String_startsWith_1 proc, string1: ptr byte, strPrefix: ptr byte, position: dword
+	mov esi, strPrefix		; source = start of the prefix in memory
+	mov edi, string1		; destination = start of string in memory
+	mov ecx, 0				; ecx = char # of strPrefix
+	mov edx, position		; edx = char # of str1
 
+	.while byte ptr [esi + ecx] != 0	; loop through prefix until a 0 is found
+		mov bl, byte ptr [edi + edx]	; store the character in BL
+		.if byte ptr [esi + ecx] != bl  ; compare BL with the current char in string1
+			mov eax, 0					; if they're not equal, return false
+			mov al, 0
+			ret
+		.endif
+		inc ecx							; increment char positions after each run
+		inc edx
+	.endw
+	mov eax, 0
+	mov al, 1							; if we get here, we've checked every char, return true
+	ret
 String_startsWith_1 endp
 
-String_startsWith_2 proc
-
+String_startsWith_2 proc, string1: ptr byte, strPrefix: ptr byte
+	push 0
+	push strPrefix
+	push string1
+	call String_startsWith_1	; call String_startsWith_1(string1, strPrefix, 0) to check the beginning
+	add esp, 16
+	ret
 String_startsWith_2 endp
 
-String_endsWith proc
+String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
+	push string1
+	call String_length
+	add esp, 8
+	mov ebx, eax
 
+	push strSuffix
+	call String_length
+	add esp, 8
+	sub ebx, eax
+
+	push ebx
+	push strSuffix
+	push string1
+	call String_startsWith_1
+	add esp, 16
+	ret
 String_endsWith endp
 
 end
