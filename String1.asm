@@ -126,8 +126,20 @@ String_substring_2 proc, string1: ptr byte, beginIndex: dword
 	ret
 String_substring_2 endp
 
-String_charAt proc
-	
+String_charAt proc, string1: ptr byte, position: dword
+	push string1
+	call String_length	; have to check if the position is out of bounds, so we need length
+	add esp, 4
+
+	.if position < 0 || position >= eax ; if the position is outside of [0, length)
+		mov eax, 0						; return NULL
+		ret
+	.endif
+
+	mov esi, string1
+	mov eax, 0
+	mov al, byte ptr [esi + position] ; get the character at the specified position
+	ret
 String_charAt endp
 
 String_startsWith_1 proc
