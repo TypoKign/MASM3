@@ -21,17 +21,17 @@ memoryallocBailey  proto Near32 stdcall, dNumBytes:dword
 ;main endp
 
 String_length proc, string2: ptr byte
-	mov eax, 0			; clear character counter
+	mov eax, 0		; clear character counter
 	mov esi, string2
 
 beginwhile:
 	cmp byte ptr[esi],0	; if (character == NULL)
 	je endwhile       	; exit the loop
 	inc eax           	; length++
-	inc esi			  	; increment index
+	inc esi			; increment index
 	jmp beginwhile    	; repeat loop
 endwhile:
-	ret					; length is in eax, not including null char
+	ret			; length is in eax, not including null char
 String_length endp
 
 lastIndexOf1 proc         
@@ -39,23 +39,23 @@ lastIndexOf1 proc
 	push ebp
 	mov ebp, esp
 	
-	mov esi, [ebp + 8]			; store string1 address in esi
-	mov edi, [ebp + 12]			; store char address in edi
+	mov esi, [ebp + 8]		; store string1 address in esi
+	mov edi, [ebp + 12]		; store char address in edi
 	mov dl, byte ptr [edi]		; store the char in dl
-	mov ebx, 0					; clear the index count
+	mov ebx, 0			; clear the index count
 	.while byte ptr [esi] != 0
 		cmp byte ptr [esi], dl	; check for the char
 		jz save
 		jmp skip
 	save:
-		mov eax, ebx			; save the current index position
+		mov eax, ebx		; save the current index position
 	skip:
-		inc esi					; go to next index
-		inc ebx					; increment index counter
+		inc esi			; go to next index
+		inc ebx			; increment index counter
 	.endw
 	
 	pop ebp
-	ret							; index is in eax
+	ret				; index is in eax
 lastIndexOf1 endp
 
 lastIndexOf2 proc
@@ -63,24 +63,24 @@ lastIndexOf2 proc
 	push ebp
 	mov ebp, esp
 	
-	mov esi, [ebp + 8]			; store string1 address in esi
-	add esi, [ebp + 16]			; go to starting point in string
-	mov edi, [ebp + 12]			; store char address in edi
+	mov esi, [ebp + 8]		; store string1 address in esi
+	add esi, [ebp + 16]		; go to starting point in string
+	mov edi, [ebp + 12]		; store char address in edi
 	mov dl, byte ptr [edi]		; move the char to dl
-	mov ebx, 0					; clear the index count
+	mov ebx, 0			; clear the index count
 	.while byte ptr [esi] != 0
 		cmp byte ptr [esi], dl	; check for the char
 		jz save
 		jmp skip
 	save:
-		mov eax, ebx			; save the current index position
+		mov eax, ebx		; save the current index position
 	skip:
-		inc esi					; go to next index
-		inc ebx					; increment index counter
+		inc esi			; go to next index
+		inc ebx			; increment index counter
 	.endw
 	
 	pop ebp
-	ret								; index is in eax
+	ret				; index is in eax
 lastIndexOf2 endp
 
 COMMENT @ ; lastIndexOf3 & String_concat don't work.
@@ -89,19 +89,19 @@ lastIndexOf3 proc
 	push ebp
 	mov ebp, esp
 	
-	mov esi, [ebp + 8]			; store string1 address in esi
-	mov edi, [ebp + 12]			; store other string's address in edi
+	mov esi, [ebp + 8]		; store string1 address in esi
+	mov edi, [ebp + 12]		; store other string's address in edi
 
-	mov ebx, 0					; clear the index count
+	mov ebx, 0			; clear the index count
 	.while byte ptr [esi] != 0
 		cmp byte ptr [esi], byte ptr [edi]	; check for equality
 		jz save
 		jmp skip
 	save:
-		mov eax, ebx			; save the current index position
+		mov eax, ebx		; save the current index position
 	skip:
-		inc esi					; go to next index in string1
-		inc ebx					; increment index counter
+		inc esi			; go to next index in string1
+		inc ebx			; increment index counter
 	.endw
 	
 	pop ebp
@@ -111,16 +111,16 @@ lastIndexOf3 endp
 ;String_concat(string1:String,str:String):String  
 ;Concatenates the specified string “str” at the end of the string.
 String_concat proc, string1: ptr byte, str2: ptr byte
-	xor eax, eax		; clear eax
+	xor eax, eax			; clear eax
 	push string1
-	call String_length	; get string length of string1
+	call String_length		; get string length of string1
 	add esp, 8			; clean up stack
-	mov ecx, eax		; save length
+	mov ecx, eax			; save length
 	
 	push str2
-	call String_length	; get string length of str2
+	call String_length		; get string length of str2
 	add esp, 8			; clean up stack
-	add eax, ecx		; add the two string lengths
+	add eax, ecx			; add the two string lengths
 	inc eax				; +1 for terminating null
 	
 	invoke memoryallocBailey, eax	; allocate the calculated space on heap for new string
@@ -129,20 +129,20 @@ String_concat proc, string1: ptr byte, str2: ptr byte
 	.while byte ptr [esi] != 0
 		mov dl, byte ptr [esi]	; get string1 char from memory
 		mov byte ptr [eax], dl	; move it into memory of new string
-		inc esi					; go to next char for string1
-		inc eax					; go to next char for new string
+		inc esi			; go to next char for string1
+		inc eax			; go to next char for new string
 	.endw
 	
 	mov esi, str2
 	.while byte ptr [esi] != 0
 		mov dl, byte ptr [esi]	; get str2 char from memory
 		mov byte ptr [eax], dl	; move it into memory of new string
-		inc esi					; go to next char for str2
-		inc eax					; go to next char for new string
+		inc esi			; go to next char for str2
+		inc eax			; go to next char for new string
 	.endw
 	mov byte ptr [eax], 0		; append null to concatenated string
 	
-	ret							; eax contains memory address of new string
+	ret				; eax contains memory address of new string
 String_concat endp
 @
 
@@ -154,15 +154,15 @@ String_replace proc, string1: ptr byte, oldChar: ptr byte, newChar: ptr byte
 	mov ebx, oldChar
 	mov ecx, newChar
 	
-	.while byte ptr [eax] != 0	; until the string reaches null
-		mov dl, byte ptr [eax]	; move one byte from old string into dl
-		mov dh, byte ptr [ebx]	; move old char into dh from memory
+	.while byte ptr [eax] != 0		; until the string reaches null
+		mov dl, byte ptr [eax]		; move one byte from old string into dl
+		mov dh, byte ptr [ebx]		; move old char into dh from memory
 		.if dl == dh			; compare the character with oldChar
 			mov dl, byte ptr [ecx]	; move new char into dl from memory
 			mov byte ptr [eax], dl	; replace oldChar with newChar
 		.endif
-		inc eax					; go to next character
-	.endw						; eax holds new string
+		inc eax				; go to next character
+	.endw					; eax holds new string
 	
 	ret
 String_replace endp
@@ -171,42 +171,42 @@ String_replace endp
 ;It converts the string to lower case string
 String_toLowerCase proc, string1: ptr byte
 	mov esi, string1			; get string to convert from the stack
-	.while byte ptr [esi] != 0	; while not at the end of string
-		mov al, byte ptr [esi]	; get a char from memory
+	.while byte ptr [esi] != 0		; while not at the end of string
+		mov al, byte ptr [esi]		; get a char from memory
 		.if al < 'A'			; if the char is less than ascii a 
-			jmp skip			; skip it
+			jmp skip		; skip it
 		.endif					
 		.if al > 'Z'			; if the char is greater than ascii z
-			jmp skip			; skip it
+			jmp skip		; skip it
 		.endif
 		
 		xor byte ptr [esi], 00100000b	; convert the char to lowercase
 
 		skip:
-		inc esi					; go to next char
+		inc esi				; go to next char
 	.endw
 	mov eax, esi
 	
-	ret							; converted string address is in eax
+	ret					; converted string address is in eax
 String_toLowerCase endp
 
 ;String_toUpperCase(string1:String):String   
 ;It converts the string to upper case string
 String_toUpperCase proc, string1: ptr byte
 	mov esi, string1	; get string to convert from the stack
-	.while byte ptr [esi] != 0	; while not at the end of string
-		mov al, byte ptr [esi]	; get a char from memory
+	.while byte ptr [esi] != 0		; while not at the end of string
+		mov al, byte ptr [esi]		; get a char from memory
 		.if al < 'a'			; if the char is less than ascii a 
-			jmp skip			; skip it
+			jmp skip		; skip it
 		.endif					
 		.if al > 'z'			; if the char is greater than ascii z
-			jmp skip			; skip it
+			jmp skip		; skip it
 		.endif
 		
 		and byte ptr [esi], 11011111b	; convert the char to uppercase
 
 		skip:
-		inc esi					; go to next char
+		inc esi				; go to next char
 	.endw
 	mov eax, esi				; move the string's address to eax
 	
