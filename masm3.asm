@@ -18,7 +18,7 @@ putstring 	PROTO Near32 stdcall, lpStringToPrint:dword
 intasc32	proto Near32 stdcall, lpStringToHold:dword, dval:dword
 hexToChar PROTO Near32 stdcall,lpDestStr:dword,lpSourceStr:dword,dLen:dword
 
-extern String_length: Near32, String_equals: Near32, String_equalsIgnoreCase: Near32,
+extern String_equals: Near32, String_equalsIgnoreCase: Near32,
 	   String_copy: Near32, String_substring_1: Near32, String_substring_2: Near32,
 	   String_charAt: Near32, String_startsWith_1: Near32, String_startsWith_2: Near32,
 	   String_endsWith: Near32
@@ -94,6 +94,18 @@ strToLowercase		byte	"NULL", 100 dup (0)
 strToUppercase		byte	"NULL", 100 dup (0)
 
 	.code
+
+
+String_length proc, _string1: ptr byte
+	mov eax, 0
+	mov esi, _string1
+
+	.while byte ptr [esi] != 0 ; for each character in ESI that is not NULL
+		inc esi				   ; move to the next character
+		inc eax				   ; increment the count of characters
+	.endw
+	ret
+String_length endp
 
 Menu proc
 	invoke putstring, addr strMenuPrompt1

@@ -20,20 +20,6 @@ memoryallocBailey  proto Near32 stdcall, dNumBytes:dword
 	;invoke ExitProcess, 0
 ;main endp
 
-String_length proc, string2: ptr byte
-	mov eax, 0		; clear character counter
-	mov esi, string2
-
-beginwhile:
-	cmp byte ptr[esi],0	; if (character == NULL)
-	je endwhile       	; exit the loop
-	inc eax           	; length++
-	inc esi			; increment index
-	jmp beginwhile    	; repeat loop
-endwhile:
-	ret			; length is in eax, not including null char
-String_length endp
-
 lastIndexOf1 proc         
 ; receives: string1 (byte ptr), char (byte ptr)
 	push ebp

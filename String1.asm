@@ -14,21 +14,12 @@
 
 memoryallocBailey	PROTO NEAR32 stdcall, dSize:dword
 
+extern String_length: Near32
+
 	.data
 
 
 	.code
-String_length proc, string1: ptr byte
-	mov eax, 0
-	mov esi, string1
-
-	.while byte ptr [esi] != 0 ; for each character in ESI that is not NULL
-		inc esi				   ; move to the next character
-		inc eax				   ; increment the count of characters
-	.endw
-	ret
-String_length endp
-
 String_equals proc, string1: ptr byte, string2: ptr byte
 	push string1		
 	call String_length	; get the length of string1 and store it in EDI
@@ -40,6 +31,7 @@ String_equals proc, string1: ptr byte, string2: ptr byte
 
 	.if edi != eax		; if the two strings have different length, we can return early
 		mov eax, 0
+		mov al, 0
 		ret
 	.endif
 
@@ -56,7 +48,8 @@ String_equals proc, string1: ptr byte, string2: ptr byte
 		inc edi
 	.endw
 
-	mov eax, 1						; if the loop finishes, all characters are equal
+	mov eax, 0	
+	mov al, 1						; if the loop finishes, all characters are equal
 	ret
 String_equals endp
 
