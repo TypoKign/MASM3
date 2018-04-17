@@ -242,9 +242,10 @@ Menu endp
 
 _main:
 	push offset string1
-	call String_copy
-	mov dCopyAddress, eax
-	call Menu
+	push offset string2
+	call String_equals
+	call String_equalsIgnoreCase
+
 
 	invoke ExitProcess, 0
 end _main

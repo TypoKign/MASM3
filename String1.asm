@@ -14,7 +14,7 @@
 
 memoryallocBailey	PROTO NEAR32 stdcall, dSize:dword
 
-extern String_length: Near32
+extern String_length: Near32, String_toLowerCase: Near32
 
 	.data
 
@@ -54,19 +54,39 @@ String_equals proc, string1: ptr byte, string2: ptr byte
 String_equals endp
 
 String_equalsIgnoreCase proc, string1: ptr byte, string2: ptr byte
-	; push string1
-	; call String_toLowerCase		; convert string1 to lowercase
-	; add esp, 4
-	; mov esi, eax
-	; push string2
-	; call String_toLowerCase		; convert string2 to lowercase
-	; add esp, 4
-	; mov edi, eax
+	push string1		
+	call String_length	; get the length of string1 and store it in EDI
+	add esp, 4
+	mov edi, eax
+	push string2
+	call String_length	; get the length of string2 and store it in EAX
+	add esp, 4
 
-	; push esi
-	; push edi
-	; call String_equals			; compare the two lowercase strings
-	; ret
+	.if edi != eax		; if the two strings have different length, we can return early
+		mov eax, 0
+		mov al, 0
+		ret
+	.endif
+
+	mov esi, string1
+	mov edi, string2
+
+	.while byte ptr [esi] != 0		; loop through each character of string 1
+		mov bl, byte ptr [edi]		; get the character from string 2 from memory
+		mov dl, byte ptr [esi]
+		or bl, 00100000b			; set the 32 bit to convert char1 to lowercase
+		or dl, 00100000b			; set the 32 bit to convert char2 to lowercase
+		.if dl != bl	; compare the same character in both strings
+			mov eax, 0				; if they aren't equal, return FALSE
+			ret
+		.endif
+		inc esi						; increment ESI and EDI after each loop
+		inc edi
+	.endw
+
+	mov eax, 0	
+	mov al, 1						; if the loop finishes, all characters are equal
+	ret
 String_equalsIgnoreCase endp
 
 String_copy proc, string1: ptr byte
