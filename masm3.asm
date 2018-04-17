@@ -57,10 +57,15 @@ strMenuPrompt27		byte	"*********************************************************
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INPUT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strChoicePrompt		byte	"Choice (1-23): ",0
-strChoice			byte	3 dup (?)
+strChoice			byte	11 dup (?)
 dChoice				dword	0
+strInvalid			byte	"Invalid input, returning to menu...",0
 strInputPrompt1		byte	"Enter a value for String 1: ", 0
 strInputPrompt2		byte	"Enter a value for String 2: ", 0
+strSelectPrompt		byte	"Enter <1> for String 1, or <2> for String 2: ",0
+strBeginIndex		byte	"Enter begin index: ",0
+strEndIndex			byte	"Enter end index: ",0
+strPositionPrompt	byte	"Enter the position to retrieve: ",0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FORMATTING ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strCrlf				byte	13,10,0
@@ -76,8 +81,8 @@ string2				byte	"NULL", 100 dup (0)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; MENU FUNCTION VALUES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dLength				dword	0
 strLength			byte	11 dup (?)
-strEquals			byte	"FALSE",0
-strEqualsIgnoreCase byte	"FALSE",0
+bEquals				byte	0
+bEqualsIgnoreCase	byte	0
 dCopyAddress		dword	0
 strCopyAddress		byte	9 dup (?)
 dSub1Address		dword	0
@@ -139,11 +144,19 @@ Menu proc
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt7 ; string equals
-	invoke putstring, addr strEquals
+	.if bEquals == 1
+		invoke putstring, addr strTrue
+	.else
+		invoke putstring, addr strFalse
+	.endif
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt8 ; string equals ignore case
-	invoke putstring, addr strEqualsIgnoreCase
+	.if bEqualsIgnoreCase == 1
+		invoke putstring, addr strTrue
+	.else
+		invoke putstring, addr strFalse
+	.endif
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt9 ; string copy
@@ -269,19 +282,133 @@ Input proc
 		invoke getstring, addr string2, 100
 		invoke putstring, addr strCrlf
 	.elseif dChoice == 3
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
 
+		.if eax == 1
+			push offset string1
+			call String_length
+			add esp, 4
+			mov dLength, eax
+		.elseif eax == 2
+			push offset string2
+			call String_length
+			add esp, 4
+			mov dLength, eax
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
 	.elseif dChoice == 4
-
+		push offset string2
+		push offset string1
+		call String_equals
+		add esp, 8
+		mov bEquals, al
 	.elseif dChoice == 5
-
+		push offset string2
+		push offset string1
+		call String_equalsIgnoreCase
+		add esp, 8
+		mov bEqualsIgnoreCase, al
 	.elseif dChoice == 6
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
 
+		.if eax == 1
+			push offset string1
+			call String_copy
+			add esp, 4
+			mov dCopyAddress, eax
+		.elseif eax == 2
+			push offset string2
+			call String_copy
+			add esp, 4
+			mov dCopyAddress, eax
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
 	.elseif dChoice == 7
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
 
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+
+		invoke putstring, addr strBeginIndex
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+
+		invoke putstring, addr strEndIndex
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov edi, eax
+
+		push edi
+		push esi
+		push edx
+		call String_substring_1
+		add esp, 12
+		mov dSub1Address, eax
 	.elseif dChoice == 8
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
 
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+
+		invoke putstring, addr strBeginIndex
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+
+		push esi
+		push edx
+		call String_substring_2
+		add esp, 8
+		mov dSub2Address, eax
 	.elseif dChoice == 9
-	
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+
+		invoke putstring, addr strPositionPrompt
+		; todo: finish
 	.elseif dChoice == 10
 
 	.elseif dChoice == 11
