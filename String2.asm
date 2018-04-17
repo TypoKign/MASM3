@@ -31,6 +31,8 @@ String_lastIndexOf1 proc
 	mov edi, [ebp + 12]		; store char address in edi
 	mov dl, byte ptr [edi]		; store the char in dl
 	mov ebx, 0			; clear the index count
+	xor eax, eax			; clear return value
+	
 	.while byte ptr [esi] != 0
 		cmp byte ptr [esi], dl	; check for the char
 		jz save
@@ -41,6 +43,10 @@ String_lastIndexOf1 proc
 		inc esi			; go to next index
 		inc ebx			; increment index counter
 	.endw
+	
+	.if eax == 0
+		mov eax, -1		; if char was not found, return -1
+	.endif
 	
 	pop ebp
 	ret				; index is in eax
@@ -56,6 +62,8 @@ String_lastIndexOf2 proc
 	mov edi, [ebp + 12]		; store char address in edi
 	mov dl, byte ptr [edi]		; move the char to dl
 	mov ebx, 0			; clear the index count
+	xor eax, eax			; clear return value
+	
 	.while byte ptr [esi] != 0
 		cmp byte ptr [esi], dl	; check for the char
 		jz save
@@ -66,6 +74,10 @@ String_lastIndexOf2 proc
 		inc esi			; go to next index
 		inc ebx			; increment index counter
 	.endw
+	
+	.if eax == 0
+		mov eax, -1		; if char was not found, return -1
+	.endif
 	
 	pop ebp
 	ret				; index is in eax
