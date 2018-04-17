@@ -20,7 +20,7 @@ memoryallocBailey  proto Near32 stdcall, dNumBytes:dword
 	;invoke ExitProcess, 0
 ;main endp
 
-lastIndexOf1 proc         
+String_lastIndexOf1 proc         
 ; receives: string1 (byte ptr), char (byte ptr)
 	push ebp
 	mov ebp, esp
@@ -42,9 +42,9 @@ lastIndexOf1 proc
 	
 	pop ebp
 	ret				; index is in eax
-lastIndexOf1 endp
+String_lastIndexOf1 endp
 
-lastIndexOf2 proc
+String_lastIndexOf2 proc
 	; receives: string1 (byte ptr), char (byte ptr), fromIndex (dword)
 	push ebp
 	mov ebp, esp
@@ -67,10 +67,10 @@ lastIndexOf2 proc
 	
 	pop ebp
 	ret				; index is in eax
-lastIndexOf2 endp
+String_lastIndexOf2 endp
 
 COMMENT @ ; lastIndexOf3 & String_concat don't work.
-lastIndexOf3 proc
+String_lastIndexOf3 proc
 	; receives: string1 (byte ptr), strOther (byte ptr)
 	push ebp
 	mov ebp, esp
@@ -92,7 +92,7 @@ lastIndexOf3 proc
 	
 	pop ebp
 	ret	
-lastIndexOf3 endp
+String_lastIndexOf3 endp
 
 ;String_concat(string1:String,str:String):String  
 ;Concatenates the specified string “str” at the end of the string.
