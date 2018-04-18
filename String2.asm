@@ -52,10 +52,15 @@ String_lastIndexOf1 proc
 	ret				; index is in eax
 String_lastIndexOf1 endp
 
-String_lastIndexOf2 proc
-	; receives: string1 (byte ptr), char (byte ptr), fromIndex (dword)
-	push ebp
-	mov ebp, esp
+String_lastIndexOf2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
+	push string1
+	call String_length      ; get length of source string
+	add esp, 8
+	
+	.if fromIndex > eax     ; check if the parameter index is out of bounds
+		mov eax, -1         ; if out of bounds, return -1
+		ret
+	.endif
 	
 	mov esi, [ebp + 8]		; store string1 address in esi
 	add esi, [ebp + 16]		; go to starting point in string
@@ -78,36 +83,46 @@ String_lastIndexOf2 proc
 	.if eax == 0
 		mov eax, -1		; if char was not found, return -1
 	.endif
-	
-	pop ebp
+
 	ret				; index is in eax
 String_lastIndexOf2 endp
 
-COMMENT @ ; lastIndexOf3 & String_concat don't work.
-String_lastIndexOf3 proc
-	; receives: string1 (byte ptr), strOther (byte ptr)
-	push ebp
-	mov ebp, esp
+String_lastIndexOf3 proc, string1: ptr byte, strOther: ptr byte
 	
-	mov esi, [ebp + 8]		; store string1 address in esi
-	mov edi, [ebp + 12]		; store other string's address in edi
-
-	mov ebx, 0			; clear the index count
-	.while byte ptr [esi] != 0
-		cmp byte ptr [esi], byte ptr [edi]	; check for equality
-		jz save
-		jmp skip
-	save:
-		mov eax, ebx		; save the current index position
-	skip:
-		inc esi			; go to next index in string1
-		inc ebx			; increment index counter
+	mov esi, string1                        ; store string1 address in esi
+	mov edi, strOther                       ; store other string's address in edi
+	xor ebx, ebx                            ; clear string1 index counter
+	xor ecx, ecx                            ; clear substring index counter
+	xor eax, eax                            ; clear return value
+	
+	.while byte ptr [esi] != 0              ; while string1 not null
+		mov dl, byte ptr [edi]              ; get a char from strOther
+		mov dh, byte ptr [esi]              ; get a char from string1
+		.if dh == dl                        ; if they are equal
+			push esi                        ; save current position of string1
+			push edi                        ; save current position of strOther
+			.while byte ptr [edi] != 0      ; while strOther is not null
+				mov cl, byte ptr [edi]      ; get a char from strOther
+				mov ch, byte ptr [esi]      ; get a char from string1
+				.if cl != ch                ; if they are not equal
+					.break                  ; exit inner while loop
+				.endif 
+				inc esi                     ; else go to next char in string1
+				inc edi                     ; else go to next char in strOther
+				inc ecx                     ; else increment substring index counter
+			.endw
+			.if byte ptr [edi] == 0         ; if strOther had been completely traversed
+				mov eax, ebx                ; save string1 index count in eax
+			.endif
+			pop edi                         ; restore old address position of strOther
+			pop esi                         ; restore old address position of string1
+		.endif
+		inc esi                             ; else go to next char in string1
+		inc ebx                             ; else increment string1 index counter 
 	.endw
-	
-	pop ebp
-	ret	
+
+	ret                                     ; index is in eax
 String_lastIndexOf3 endp
-@
 
 ;String_concat(string1:String,str:String):String  
 ;Concatenates the specified string “str” at the end of the string.
@@ -210,22 +225,7 @@ String_toUpperCase proc, string1: ptr byte
 		skip:
 		inc esi				; go to next char
 	.endw
-	mov eax, esi				; move the string's address to eax
-	
-	;Tried to allocated new string and copy into it, doesn't work though.
-	;push string1
-	;call String_length	; get length of string to convert
-	;add esp, 8
-	;inc eax				; add one for a null
-	;invoke memoryallocBailey, eax	; allocate heap memory for new string
-	;mov esi, string1
-	;.while byte ptr [esi] != 0	; until converted string is null
-	;	mov bl, byte ptr [esi]	; move char into bl
-	;	mov byte ptr [eax], bl	; put that char into new memory location
-	;	inc esi					; go to the next character in string to copy
-	;	inc eax					; go to next byte in memory
-	;.endw
-	;mov byte ptr [eax], 0		; add a null at the end
+	mov eax, esi				; move the string's address into eax
 	
 	ret							; converted string address is in eax
 String_toUpperCase endp
