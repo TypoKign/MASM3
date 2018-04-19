@@ -187,6 +187,7 @@ String_startsWith_2 proc, string1: ptr byte, strPrefix: ptr byte
 	ret
 String_startsWith_2 endp
 
+COMMENT @
 String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
 	push string1
 	call String_length
@@ -203,6 +204,35 @@ String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
 	push string1
 	call String_startsWith_1
 	add esp, 16
+	ret
+String_endsWith endp
+@
+
+String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
+	push strSuffix
+	call String_length
+	add esp, 4
+	mov ebx, eax        ; save length of suffix
+
+    mov esi, string1
+	.while byte ptr [esi] != 0
+		inc esi
+	.endw               ; esi now points to end of string
+	
+	sub esi, ebx        ; adjust index to beginning of suffix
+	mov edi, strSuffix  ; edi points to strSuffix
+	.while byte ptr [esi] != 0
+		mov dl, byte ptr [esi]
+		mov dh, byte ptr [edi]
+		.if dl != dh
+			mov al, 0    ; if not equal, return false
+			ret
+		.endif
+		inc esi          ; go to next char in string1
+		inc edi          ; go to next char in suffix
+	.endw
+	
+	mov al, 1            ; if reached this point, return true
 	ret
 String_endsWith endp
 
