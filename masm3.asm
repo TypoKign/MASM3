@@ -64,7 +64,7 @@ strMenuPrompt27		byte	"*********************************************************
 strChoicePrompt		byte	"Choice (1-23): ",0
 strChoice			byte	11 dup (?)
 dChoice				dword	0
-strInvalid			byte	"Invalid input, returning to menu...",0
+strInvalid			byte	"Invalid input, returning to menu...",13,10,0
 strInputPrompt1		byte	"Enter a value for String 1: ", 0
 strInputPrompt2		byte	"Enter a value for String 2: ", 0
 strSelectPrompt		byte	"Enter <1> for String 1, or <2> for String 2: ",0
@@ -82,6 +82,7 @@ strTrue				byte	"TRUE",0
 strFalse			byte	"FALSE",0
 strNull				byte	"NULL",0
 strCurrently		byte	" currently:",0
+strClearScreen		byte	100 DUP(100 DUP(" "),13,10),0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INPUT STRINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 string1				byte	"NULL", 100 dup (0)
@@ -749,6 +750,7 @@ Input endp
 
 _main:
 	.while dChoice != 23
+		invoke putstring, addr strClearScreen
 		call Menu
 		call Input
 	.endw

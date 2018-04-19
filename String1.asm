@@ -109,6 +109,15 @@ String_copy proc, string1: ptr byte
 String_copy endp
 
 String_substring_1 proc, string1: ptr byte, beginIndex: dword, endIndex: dword
+	push string1
+	call String_length
+	add esp, 4
+	mov ebx, beginIndex
+	.if ebx < 0 || ebx > eax || endIndex < ebx || endIndex > eax
+		mov eax, 0
+		ret
+	.endif
+
 	mov esi, string1		; esi = memory location of first char to copy
 	add esi, beginIndex
 
@@ -158,6 +167,15 @@ String_charAt proc, string1: ptr byte, position: dword
 String_charAt endp
 
 String_startsWith_1 proc, string1: ptr byte, strPrefix: ptr byte, position: dword
+	push string1
+	call String_length
+	add esp, 4
+
+	.if position < 0 || position > eax
+		mov eax, 0
+		ret
+	.endif
+
 	mov esi, strPrefix		; source = start of the prefix in memory
 	mov edi, string1		; destination = start of string in memory
 	mov ecx, 0				; ecx = char # of strPrefix
