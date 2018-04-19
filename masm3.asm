@@ -131,7 +131,11 @@ String_length proc, _string1: ptr byte
 	ret
 String_length endp
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Menu proc
+; Prints the menu, values of string1 and string2, and the current results of the 
+; operations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	invoke putstring, addr strMenuPrompt1
 	invoke putstring, addr strMenuPrompt2
 	invoke putstring, addr strMenuPrompt3
@@ -286,26 +290,26 @@ Input proc
 	invoke ascint32, addr strChoice				; convert it to an int
 	mov dChoice, eax
 
-	.if dChoice == 1
-		invoke putstring, addr strInputPrompt1
-		invoke getstring, addr string1, 100
+	.if dChoice == 1							; set string 1
+		invoke putstring, addr strInputPrompt1	; prompt for the string
+		invoke getstring, addr string1, 100		; read the string into string1
 		invoke putstring, addr strCrlf
-	.elseif dChoice == 2
+	.elseif dChoice == 2						; set string 2
 		invoke putstring, addr strInputPrompt2
 		invoke getstring, addr string2, 100
 		invoke putstring, addr strCrlf
-	.elseif dChoice == 3
-		invoke putstring, addr strSelectPrompt
+	.elseif dChoice == 3						; string length
+		invoke putstring, addr strSelectPrompt	; prompt the user to select a string
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 
-		.if eax == 1
-			push offset string1
-			call String_length
+		.if eax == 1							; EAX holds the integer input
+			push offset string1					; load &string1 onto the stack
+			call String_length					; get string1's length
 			add esp, 4
 			mov dLength, eax
-		.elseif eax == 2
+		.elseif eax == 2						; same with string2
 			push offset string2
 			call String_length
 			add esp, 4
@@ -314,29 +318,29 @@ Input proc
 			invoke putstring, addr strInvalid
 			ret
 		.endif
-	.elseif dChoice == 4
-		push offset string2
+	.elseif dChoice == 4						; equals
+		push offset string2						; push both strings onto the stack
 		push offset string1
-		call String_equals
+		call String_equals						; check if they are equal
 		add esp, 8
 		mov bEquals, al
-	.elseif dChoice == 5
+	.elseif dChoice == 5						; equalsIgnoreCase
 		push offset string2
 		push offset string1
 		call String_equalsIgnoreCase
 		add esp, 8
 		mov bEqualsIgnoreCase, al
-	.elseif dChoice == 6
-		invoke putstring, addr strSelectPrompt
+	.elseif dChoice == 6						; copy
+		invoke putstring, addr strSelectPrompt	; select a string
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 
-		.if eax == 1
+		.if eax == 1							; push the selected string onto the stack
 			push offset string1
 			call String_copy
 			add esp, 4
-			mov dCopyAddress, eax
+			mov dCopyAddress, eax				; address is stored in dCopyAddress
 		.elseif eax == 2
 			push offset string2
 			call String_copy
@@ -346,7 +350,7 @@ Input proc
 			invoke putstring, addr strInvalid
 			ret
 		.endif
-	.elseif dChoice == 7
+	.elseif dChoice == 7						; substring_1
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
@@ -361,31 +365,31 @@ Input proc
 			ret
 		.endif
 
-		invoke putstring, addr strBeginIndex
+		invoke putstring, addr strBeginIndex	; prompt the user for the start index
 		invoke getstring, addr strChoice, 11
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		mov esi, eax
 
-		invoke putstring, addr strEndIndex
+		invoke putstring, addr strEndIndex		; prompt for end index
 		invoke getstring, addr strChoice, 11
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		mov edi, eax
 
-		push edi
+		push edi					; push end index, start index, and string
 		push esi
 		push edx
 		call String_substring_1
 		add esp, 12
-		mov dSub1Address, eax
-	.elseif dChoice == 8
+		mov dSub1Address, eax		; address of new string goes in dSub1Address
+	.elseif dChoice == 8						; substring_2
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 
-		.if eax == 1
+		.if eax == 1							; user selects string1 or 2 as before
 			mov edx, offset string1
 		.elseif eax == 2
 			mov edx, offset string2
@@ -394,7 +398,7 @@ Input proc
 			ret
 		.endif
 
-		invoke putstring, addr strBeginIndex
+		invoke putstring, addr strBeginIndex	; prompt for begin index only
 		invoke getstring, addr strChoice, 11
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
@@ -405,7 +409,7 @@ Input proc
 		call String_substring_2
 		add esp, 8
 		mov dSub2Address, eax
-	.elseif dChoice == 9
+	.elseif dChoice == 9					; charAt
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
@@ -429,29 +433,29 @@ Input proc
 		push edx
 		call String_charAt
 		add esp, 8
-		mov strCharAt, al
-	.elseif dChoice == 10
-		invoke putstring, addr strPositionPrompt
+		mov strCharAt, al					; charAt returns an ASCII codepoint, not an address. stored in a byte
+	.elseif dChoice == 10					; startsWith_1
+		invoke putstring, addr strPositionPrompt	; prompt for a position
 		invoke getstring, addr strChoice, 11
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 
-		push eax
-		push offset string2
+		push eax							; push position
+		push offset string2					; push both strings onto the stack
 		push offset string1
 		call String_startsWith_1
 		add esp, 12
 
 		mov bStartsWith1, al
-	.elseif dChoice == 11
+	.elseif dChoice == 11					; startsWith_2
 		push offset string2
 		push offset string1
-		call String_startsWith_2
+		call String_startsWith_2			; no user-specified arguments, just push strings
 		add esp, 8
 
 		mov bStartsWith2, al
-	.elseif dChoice == 12
-		push offset string2
+	.elseif dChoice == 12					; endsWith
+		push offset string2					; no user-specified arguments
 		push offset string1
 		call String_endsWith
 		add esp, 8
@@ -730,10 +734,10 @@ Input endp
 
 
 _main:
-	.while dChoice != 23
-		invoke putstring, addr strClearScreen
-		call Menu
-		call Input
+	.while dChoice != 23						; 23 == exit
+		invoke putstring, addr strClearScreen	; clear the screen
+		call Menu								; print the menu and current values
+		call Input								; prompt for input and call selected PROC
 	.endw
 
 	invoke ExitProcess, 0

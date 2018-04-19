@@ -137,14 +137,14 @@ String_substring_1 endp
 
 String_substring_2 proc, string1: ptr byte, beginIndex: dword
 	push string1
-	call String_length
+	call String_length		; calculate end index to be the last character, aka the strings length
 	add esp, 4
 	mov edx, eax
 
 	push edx
 	push beginIndex
 	push string1
-	call String_substring_1
+	call String_substring_1	; call substring_1 with end index/length, beginIndex argument, and string argument
 	add esp, 12
 	ret
 String_substring_2 endp
