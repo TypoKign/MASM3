@@ -24,7 +24,12 @@ extern String_equals: Near32, String_equalsIgnoreCase: Near32,
 	   String_copy: Near32, String_substring_1: Near32, String_substring_2: Near32,
 	   String_charAt: Near32, String_startsWith_1: Near32, String_startsWith_2: Near32,
 	   String_endsWith: Near32
-
+	   
+extern String_indexOf_1: Near32, String_indexOf_2:Near32, String_indexOf_3:Near32,
+       String_lastIndexOf_1: Near32, String_lastIndexOf_2: Near32, String_lastIndexOf_3: Near32,
+       String_concat: Near32, String_replace: Near32, String_toLowerCase: Near32,
+	   String_toUpperCase: Near32
+	
 	.data
 	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; MENU ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strMenuPrompt1		byte	"************************************************************",13,10,0
@@ -66,6 +71,10 @@ strSelectPrompt		byte	"Enter <1> for String 1, or <2> for String 2: ",0
 strBeginIndex		byte	"Enter begin index: ",0
 strEndIndex			byte	"Enter end index: ",0
 strPositionPrompt	byte	"Enter the position to retrieve: ",0
+strCharPrompt       byte    "Enter the character to search for: ",0
+strStringPrompt     byte    "Enter the string to search for: ",0
+strCharRep1Prompt   byte    "Enter the character you want to replace: ",0
+strCharRep2Prompt   byte    "Enter the character you want to replace it with: ",0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FORMATTING ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strCrlf				byte	13,10,0
@@ -107,9 +116,12 @@ dLastIndexOf3		dword	-1
 strLastIndexOf3		byte	11 dup (?)
 dConcatAddress		dword	0
 strConcatAddress	byte	9 dup (?)
-strReplace			byte	"NULL",100 dup (0)
-strToLowercase		byte	"NULL", 100 dup (0)
-strToUppercase		byte	"NULL", 100 dup (0)
+dReplaceAddress     dword   0
+strReplaceAddr		byte	"NULL",100 dup (0)
+dToLowercaseAddr    dword   0
+strToLowercaseAddr	byte	"NULL", 100 dup (0)
+dToUppercaseAddr    dword   0
+strToUppercaseAddr	byte	"NULL", 100 dup (0)
 
 	.code
 
@@ -250,15 +262,18 @@ Menu proc
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt23 ; string replace
-	invoke putstring, addr strReplace
+	invoke hexToChar, addr strReplaceAddr, dReplaceAddress, 0
+	invoke putstring, addr strReplaceAddr
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt24 ; string to lower case
-	invoke putstring, addr strToLowercase
+	invoke hexToChar, addr strToLowercaseAddr, dToLowercaseAddr, 0
+	invoke putstring, addr strToLowercaseAddr
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt25 ; string to uppercase
-	invoke putstring, addr strToUppercase
+	invoke hexToChar, addr strToUppercaseAddr, dToUppercaseAddr, 0
+	invoke putstring, addr strToUppercaseAddr
 	invoke putstring, addr strCrlf
 	invoke putstring, addr strMenuPrompt26
 	invoke putstring, addr strMenuPrompt27
@@ -416,25 +431,272 @@ Input proc
 	.elseif dChoice == 12
 
 	.elseif dChoice == 13
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strCharPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
 
+		push esi
+		push edx
+		call String_indexOf_1
+		add esp, 8
+		mov dIndexOf1, eax
 	.elseif dChoice == 14
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strCharPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+		
+		invoke putstring, addr strBeginIndex
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov edi, eax
 
+		push edi
+		push esi
+		push edx
+		call String_indexOf_2
+		add esp, 12
+		mov dIndexOf2, eax
 	.elseif dChoice == 15
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strStringPrompt
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
 
+		push esi
+		push edx
+		call String_indexOf_3
+		add esp, 8
+		mov dIndexOf3, eax
 	.elseif dChoice == 16
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strCharPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
 
+		push esi
+		push edx
+		call String_lastIndexOf_1
+		add esp, 8
+		mov dLastIndexOf1, eax
 	.elseif dChoice == 17
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strCharPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+		
+		invoke putstring, addr strBeginIndex
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov edi, eax
 
+		push edi
+		push esi
+		push edx
+		call String_lastIndexOf_2
+		add esp, 12
+		mov dLastIndexOf2, eax
 	.elseif dChoice == 18
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strStringPrompt
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
 
+		push esi
+		push edx
+		call String_lastIndexOf_3
+		add esp, 8
+		mov dLastIndexOf3, eax
 	.elseif dChoice == 19
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strStringPrompt
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
 
+		push esi
+		push edx
+		call String_concat
+		add esp, 8
+		mov dConcatAddress, eax
 	.elseif dChoice == 20
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
+		
+		invoke putstring, addr strCharRep1Prompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+		
+		invoke putstring, addr strCharRep2Prompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov edi, eax
 
+		push edi
+		push esi
+		push edx
+		call String_replace
+		add esp, 12
+		mov dReplaceAddress, eax
 	.elseif dChoice == 21
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
 
+		push edx
+		call String_toLowerCase
+		add esp, 12
+		mov dToLowercaseAddr, eax
 	.elseif dChoice == 22
+		invoke putstring, addr strSelectPrompt
+		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		
+		.if eax == 1
+			mov edx, offset string1
+		.elseif eax == 2
+			mov edx, offset string2
+		.else
+			invoke putstring, addr strInvalid
+			ret
+		.endif
 
+		push edx
+		call String_toUpperCase
+		add esp, 12
+		mov dToUppercaseAddr, eax
 	.elseif dChoice == 23
 
 	.else
