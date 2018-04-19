@@ -70,7 +70,7 @@ strInputPrompt2		byte	"Enter a value for String 2: ", 0
 strSelectPrompt		byte	"Enter <1> for String 1, or <2> for String 2: ",0
 strBeginIndex		byte	"Enter begin index: ",0
 strEndIndex			byte	"Enter end index: ",0
-strPositionPrompt	byte	"Enter the position to retrieve: ",0
+strPositionPrompt	byte	"Enter the position: ",0
 strCharPrompt       byte    "Enter the character to search for: ",0
 strStringPrompt     byte    "Enter the string to search for: ",0
 strCharRep1Prompt   byte    "Enter the character you want to replace: ",0
@@ -98,10 +98,10 @@ dSub1Address		dword	0
 strSub1Address		byte 	9 dup (?)
 dSub2Address		dword	0
 strSub2Address		byte	9 dup (?)
-strCharAt			byte	"NULL", 0
-strStartsWith1		byte	"FALSE",0
-strStartsWith2		byte	"FALSE",0
-strEndsWith			byte	"FALSE",0
+strCharAt			byte	"*", 0
+bStartsWith1		byte	0
+bStartsWith2		byte	0
+bEndsWith			byte	0
 dIndexOf1			dword	-1
 strIndexOf1			byte	11 dup (?)
 dIndexOf2			dword	-1
@@ -209,15 +209,27 @@ Menu proc
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt13 ; string starts with 1
-	invoke putstring, addr strStartsWith1
+	.if bStartsWith1 == 1
+		invoke putstring, addr strTrue
+	.else
+		invoke putstring, addr strFalse
+	.endif
 	invoke putstring, addr strCrlf
 	
 	invoke putstring, addr strMenuPrompt14 ; string starts with 2
-	invoke putstring, addr strStartsWith2
+	.if bStartsWith2 == 1
+		invoke putstring, addr strTrue
+	.else
+		invoke putstring, addr strFalse
+	.endif
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt15 ; string ends with
-	invoke putstring, addr strEndsWith
+	.if bEndsWith == 1
+		invoke putstring, addr strTrue
+	.else
+		invoke putstring, addr strFalse
+	.endif
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt16 ; string index of 1
@@ -423,13 +435,42 @@ Input proc
 		.endif
 
 		invoke putstring, addr strPositionPrompt
-		; todo: finish
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
+		mov esi, eax
+		push esi
+		push edx
+		call String_charAt
+		add esp, 8
+		mov strCharAt, al
 	.elseif dChoice == 10
+		invoke putstring, addr strPositionPrompt
+		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strCrlf
+		invoke ascint32, addr strChoice
 
+		push eax
+		push offset string2
+		push offset string1
+		call String_startsWith_1
+		add esp, 12
+
+		mov bStartsWith1, al
 	.elseif dChoice == 11
+		push offset string2
+		push offset string1
+		call String_startsWith_2
+		add esp, 8
 
+		mov bStartsWith2, al
 	.elseif dChoice == 12
+		push offset string2
+		push offset string1
+		call String_endsWith
+		add esp, 8
 
+		mov bEndsWith, al
 	.elseif dChoice == 13
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1

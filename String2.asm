@@ -107,7 +107,7 @@ String_indexOf_3 proc, string1: ptr byte, string2: ptr byte
     ret                                     ; index is in eax
 String_indexOf_3 endp
 
-String_lastIndexOf1 proc         
+String_lastIndexOf_1 proc         
 ; receives: string1 (byte ptr), char (byte ptr)
 	push ebp
 	mov ebp, esp
@@ -135,9 +135,9 @@ String_lastIndexOf1 proc
 	
 	pop ebp
 	ret                          ; index is in eax
-String_lastIndexOf1 endp
+String_lastIndexOf_1 endp
 
-String_lastIndexOf2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
+String_lastIndexOf_2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
 	push string1
 	call String_length           ; get length of source string
 	add esp, 8
@@ -170,9 +170,9 @@ String_lastIndexOf2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
 	.endif
 
 	ret                          ; index is in eax
-String_lastIndexOf2 endp
+String_lastIndexOf_2 endp
 
-String_lastIndexOf3 proc, string1: ptr byte, strOther: ptr byte
+String_lastIndexOf_3 proc, string1: ptr byte, strOther: ptr byte
 	
 	mov esi, string1                        ; store string1 address in esi
 	mov edi, strOther                       ; store other string's address in edi
@@ -207,7 +207,7 @@ String_lastIndexOf3 proc, string1: ptr byte, strOther: ptr byte
 	.endw
 
 	ret                                     ; index is in eax
-String_lastIndexOf3 endp
+String_lastIndexOf_3 endp
 
 ;String_concat(string1:String,str:String):String  
 ;Concatenates the specified string “str” at the end of the string.

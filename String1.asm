@@ -187,7 +187,6 @@ String_startsWith_2 proc, string1: ptr byte, strPrefix: ptr byte
 	ret
 String_startsWith_2 endp
 
-COMMENT @
 String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
 	push string1
 	call String_length
