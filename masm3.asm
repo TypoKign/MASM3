@@ -54,9 +54,9 @@ strMenuPrompt19		byte	"* <16> String_lastIndexOf_1                       current
 strMenuPrompt20		byte    "* <17> String_lastIndexOf_2                       currently:",0
 strMenuPrompt21		byte	"* <18> String_lastIndexOf_3                       currently:",0
 strMenuPrompt22		byte	"* <19> String_concat                              &",0
-strMenuPrompt23		byte	"* <20> String_replace                             currently:",0
-strMenuPrompt24		byte	"* <21> String_toLowerCase                         currently:",0
-strMenuPrompt25		byte	"* <22> String_toUpperCase                         currently:",0
+strMenuPrompt23		byte	"* <20> String_replace                                      *",13,10,0
+strMenuPrompt24		byte	"* <21> String_toLowerCase                                  *",13,10,0
+strMenuPrompt25		byte	"* <22> String_toUpperCase                                  *",13,10,0
 strMenuPrompt26		byte	"* <23> Quit                                                *",13,10,0
 strMenuPrompt27		byte	"************************************************************",13,10,0
 
@@ -117,13 +117,6 @@ dLastIndexOf3		dword	-1
 strLastIndexOf3		byte	11 dup (?)
 dConcatAddress		dword	0
 strConcatAddress	byte	9 dup (?)
-dReplaceAddress     dword   0
-strReplaceAddr		byte	"NULL",100 dup (0)
-dToLowercaseAddr    dword   0
-strToLowercaseAddr	byte	"NULL", 100 dup (0)
-dToUppercaseAddr    dword   0
-strToUppercaseAddr	byte	"NULL", 100 dup (0)
-
 	.code
 
 
@@ -275,19 +268,11 @@ Menu proc
 	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt23 ; string replace
-	invoke hexToChar, addr strReplaceAddr, dReplaceAddress, 0
-	invoke putstring, addr strReplaceAddr
-	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt24 ; string to lower case
-	invoke hexToChar, addr strToLowercaseAddr, dToLowercaseAddr, 0
-	invoke putstring, addr strToLowercaseAddr
-	invoke putstring, addr strCrlf
 
 	invoke putstring, addr strMenuPrompt25 ; string to uppercase
-	invoke hexToChar, addr strToUppercaseAddr, dToUppercaseAddr, 0
-	invoke putstring, addr strToUppercaseAddr
-	invoke putstring, addr strCrlf
+
 	invoke putstring, addr strMenuPrompt26
 	invoke putstring, addr strMenuPrompt27
 	invoke putstring, addr strCrlf
@@ -490,8 +475,7 @@ Input proc
 		invoke putstring, addr strCharPrompt
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strChoice
 
 		push esi
 		push edx
@@ -700,7 +684,6 @@ Input proc
 		push edx
 		call String_replace
 		add esp, 12
-		mov dReplaceAddress, eax
 	.elseif dChoice == 21
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1
@@ -718,8 +701,7 @@ Input proc
 
 		push edx
 		call String_toLowerCase
-		add esp, 12
-		mov dToLowercaseAddr, eax
+		add esp, 4
 	.elseif dChoice == 22
 		invoke putstring, addr strSelectPrompt
 		invoke getstring, addr strChoice, 1
@@ -737,10 +719,9 @@ Input proc
 
 		push edx
 		call String_toUpperCase
-		add esp, 12
-		mov dToUppercaseAddr, eax
+		add esp, 4
 	.elseif dChoice == 23
-
+		ret
 	.else
 
 	.endif
