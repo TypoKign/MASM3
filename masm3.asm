@@ -82,7 +82,7 @@ strTrue				byte	"TRUE",0
 strFalse			byte	"FALSE",0
 strNull				byte	"NULL",0
 strCurrently		byte	" currently:",0
-strClearScreen		byte	100 DUP(100 DUP(" "),13,10),0
+strClearScreen		byte	25 DUP(13,10),0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; INPUT STRINGS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 string1				byte	"NULL", 100 dup (0)
@@ -295,10 +295,10 @@ Menu proc
 Menu endp
 
 Input proc
-	invoke putstring, addr strChoicePrompt
-	invoke getstring, addr strChoice, 2
+	invoke putstring, addr strChoicePrompt		; prompt the user to select a menu option
+	invoke getstring, addr strChoice, 2			; get the menu option
 	invoke putstring, addr strCrlf
-	invoke ascint32, addr strChoice
+	invoke ascint32, addr strChoice				; convert it to an int
 	mov dChoice, eax
 
 	.if dChoice == 1
