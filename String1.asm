@@ -188,26 +188,6 @@ String_startsWith_2 proc, string1: ptr byte, strPrefix: ptr byte
 String_startsWith_2 endp
 
 String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
-	push string1
-	call String_length
-	add esp, 8
-	mov ebx, eax
-
-	push strSuffix
-	call String_length
-	add esp, 8
-	sub ebx, eax
-
-	push ebx
-	push strSuffix
-	push string1
-	call String_startsWith_1
-	add esp, 16
-	ret
-String_endsWith endp
-@
-
-String_endsWith proc, string1: ptr byte, strSuffix: ptr byte
 	push strSuffix
 	call String_length
 	add esp, 4
