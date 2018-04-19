@@ -45,10 +45,10 @@ String_indexOf_1 endp
 String_indexOf_2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
 	push string1
 	call String_length           ; get length of source string
-	add esp, 8
+	add esp, 4
 	
-	.if fromIndex > eax          ; check if the parameter index is out of bounds
-		mov eax, -1              ; if out of bounds, return -1
+	.if fromIndex > eax || fromIndex < 0 ; check if the parameter index is out of bounds
+		mov eax, 666              ; if out of bounds, return -1
 		ret
 	.endif
 	
@@ -215,46 +215,47 @@ String_concat proc, string1: ptr byte, str2: ptr byte
 	xor eax, eax            ; clear eax
 	push string1
 	call String_length      ; get string length of string1
-	add esp, 8              ; clean up stack
+	add esp, 4              ; clean up stack
 	mov ecx, eax            ; save length
 	
 	push str2
 	call String_length      ; get string length of str2
-	add esp, 8              ; clean up stack
+	add esp, 4              ; clean up stack
 	add eax, ecx            ; add the two string lengths
 	inc eax	                ; +1 for terminating null
-	mov edx, eax            ; save length for memory adjustment
 	
 	invoke memoryallocBailey, eax  ; allocate the calculated space on heap for new string
 	
+	xor ecx, ecx
 	mov esi, string1
-	.while byte ptr [esi] != 0
-		mov dl, byte ptr [esi]  ; get string1 char from memory
-		mov byte ptr [eax], dl  ; move it into memory of new string
-		inc esi                 ; go to next char for string1
-		inc eax                 ; go to next char for new string
+	.while byte ptr [esi + ecx] != 0
+		mov dl, byte ptr [esi + ecx]  ; get string1 char from memory
+		mov byte ptr [eax + ecx], dl  ; move it into memory of new string
+		inc ecx
 	.endw
-	
+	xor ebx, ebx
 	mov esi, str2
-	.while byte ptr [esi] != 0
-		mov dl, byte ptr [esi]  ; get str2 char from memory
-		mov byte ptr [eax], dl  ; move it into memory of new string
-		inc esi                 ; go to next char for str2
-		inc eax                 ; go to next char for new string
+	.while byte ptr [esi + ebx] != 0
+		mov dl, byte ptr [esi + ebx]  ; get str2 char from memory
+		mov byte ptr [eax + ecx], dl  ; move it into memory of new string
+		inc ecx
+		inc ebx
 	.endw
-	mov byte ptr [eax], 0       ; append null to concatenated string
-	sub eax, edx                ; move address in eax to beginning of string
+	mov byte ptr [eax + ecx], 0  ; append null to concatenated string
 	
-	ret                         ; eax contains memory address of new string
+	ret                          ; eax contains memory address of new string
 String_concat endp
 
 ;String_replace(string1:String,oldChar:char,newChar:char):String  
 ;Returns new updated string after changing all the occurrences of oldChar with the newChar.
 String_replace proc, string1: ptr byte, oldChar: ptr byte, newChar: ptr byte
 	xor eax, eax
-	mov eax, string1
-	mov ebx, oldChar
-	mov ecx, newChar
+	mov esi, string1                ; get address of string1
+	push esi                        ; save the address for later
+	
+	mov eax, string1                ; move string1 address into eax
+	mov ebx, oldChar                ; move oldChar address into ebx
+	mov ecx, newChar                ; move newChar address into ecx
 	
 	.while byte ptr [eax] != 0      ; until the string reaches null
 		mov dl, byte ptr [eax]      ; move one byte from old string into dl
@@ -264,9 +265,18 @@ String_replace proc, string1: ptr byte, oldChar: ptr byte, newChar: ptr byte
 			mov byte ptr [eax], dl  ; replace oldChar with newChar
 		.endif
 		inc eax                     ; go to next character
-	.endw                           ; eax holds new string
+	.endw
 	
-	ret
+	pop esi                         ; restore address of string1
+	.while byte ptr [esi] != 0      ; until null
+		mov dl, byte ptr [eax]      ; get a char from updated string
+		mov dh, byte ptr [esi]      ; get a char from old string
+		mov dh, dl                  ; move the new one where old one was
+		inc eax                     ; go to next char in updated string
+		inc esi                     ; go to next char in old string
+	.endw
+	
+	ret                             ; original string address holds updated string
 String_replace endp
 
 ;String_toLowerCase(string1:String):String  
