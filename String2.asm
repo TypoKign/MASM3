@@ -22,6 +22,91 @@ extern String_length: Near32
 	;invoke ExitProcess, 0
 ;main endp
 
+String_indexOf_1 proc, string1: ptr byte, char: ptr byte
+	mov esi, string1             ; get address of string1
+	mov edi, char                ; get address of char
+	
+	xor eax, eax                 ; clear index-save count
+	xor ebx, ebx                 ; clear index count
+	.while byte ptr [esi] != 0   ; while not null
+		mov dl, byte ptr [esi]   ; get a char from string1
+		mov dh, byte ptr [edi]   ; get the char to compare to
+		.if dl == dh             ; if they are equal
+			mov eax, ebx         ; save the index value
+			ret                  ; return, we have found the first occurrence
+		.endif                   ; 
+		inc esi                  ; otherwise increment to next char
+		inc ebx                  ; increment index counter
+	.endw
+	
+	ret                          ; index is in eax
+String_indexOf_1 endp
+
+String_indexOf_2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
+	push string1
+	call String_length           ; get length of source string
+	add esp, 8
+	
+	.if fromIndex > eax          ; check if the parameter index is out of bounds
+		mov eax, -1              ; if out of bounds, return -1
+		ret
+	.endif
+	
+	mov esi, string1             ; get address of string1
+    add esi, fromIndex           ; add to that address the index to start searching from
+	mov edi, char                ; get address of char to find
+	
+	xor eax, eax                 ; clear index-save count
+	xor ebx, ebx                 ; clear index count
+	.while byte ptr [esi] != 0   ; while string1 not null
+		mov dl, byte ptr [esi]   ; get a char from string1
+		mov dh, byte ptr [edi]   ; get the char to compare to
+		.if dl == dh             ; if equal
+			mov eax, ebx         ; save the index count
+			ret                  ; return, we have found the first occurrence
+		.endif
+		inc esi                  ; otherwise increment to next char 
+		inc ebx                  ; increment index counter
+	.endw
+	ret                          ; index is in eax
+String_indexOf_2 endp
+
+String_indexOf_3 proc, string1: ptr byte, string2: ptr byte
+    mov esi, string1                        ; store string1 address in esi
+	mov edi, string2                        ; store other string's address in edi
+	xor ebx, ebx                            ; clear string1 index counter
+	xor ecx, ecx                            ; clear substring index counter
+	xor eax, eax                            ; clear return value
+	
+	.while byte ptr [esi] != 0              ; while string1 not null
+		mov dl, byte ptr [edi]              ; get a char from strOther
+		mov dh, byte ptr [esi]              ; get a char from string1
+		.if dh == dl                        ; if they are equal
+			push esi                        ; save current position of string1
+			push edi                        ; save current position of strOther
+			.while byte ptr [edi] != 0      ; while strOther is not null
+				mov cl, byte ptr [edi]      ; get a char from strOther
+				mov ch, byte ptr [esi]      ; get a char from string1
+				.if cl != ch                ; if they are not equal
+					.break                  ; exit inner while loop
+				.endif 
+				inc esi                     ; else go to next char in string1
+				inc edi                     ; else go to next char in strOther
+				inc ecx                     ; else increment substring index counter
+			.endw
+			.if byte ptr [edi] == 0         ; if strOther had been completely traversed
+				mov eax, ebx                ; save string1 index count in eax
+				ret                         ; return, we have found the first occurrence
+			.endif
+			pop edi                         ; restore old address position of strOther
+			pop esi                         ; restore old address position of string1
+		.endif
+		inc esi                             ; else go to next char in string1
+		inc ebx                             ; else increment string1 index counter 
+	.endw
+    ret                                     ; index is in eax
+String_indexOf_3 endp
+
 String_lastIndexOf1 proc         
 ; receives: string1 (byte ptr), char (byte ptr)
 	push ebp
