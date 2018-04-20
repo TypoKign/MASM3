@@ -467,9 +467,9 @@ Input proc
 		add esp, 8
 
 		mov bEndsWith, al
-	.elseif dChoice == 13
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+	.elseif dChoice == 13                       ; String_indexOf_1 option
+		invoke putstring, addr strSelectPrompt  ; prompt for string choice
+		invoke getstring, addr strChoice, 1     ; get users choice of string
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -478,23 +478,23 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid   ; display error if invalid
 			ret
 		.endif
 		
-		invoke putstring, addr strCharPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCharPrompt    ; prompt for char choice
+		invoke getstring, addr strChoice, 1     ; get substring from user
 		invoke putstring, addr strCrlf
 		mov esi, offset strChoice
 
 		push esi
 		push edx
-		call String_indexOf_1
+		call String_indexOf_1                   ; call String_indexOf_1
 		add esp, 8
 		mov dIndexOf1, eax
-	.elseif dChoice == 14
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+	.elseif dChoice == 14                       ; String_indexOf_2 option
+		invoke putstring, addr strSelectPrompt  ; prompt for string choice
+		invoke getstring, addr strChoice, 1     ; get user's choice of string1 or 2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -503,17 +503,17 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid   ; display error if invalid
 			ret
 		.endif
 		
-		invoke putstring, addr strCharPrompt
-		invoke getstring, addr strCharSearch, 1
+		invoke putstring, addr strCharPrompt    ; prompt for char choice
+		invoke getstring, addr strCharSearch, 1 ; get char from user
 		invoke putstring, addr strCrlf
 		mov esi, offset strCharSearch
 		
 		invoke putstring, addr strBeginIndex
-		invoke getstring, addr strSearchIndex, 2
+		invoke getstring, addr strSearchIndex, 2 ; get index from user
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strSearchIndex
 		mov edi, eax
@@ -521,7 +521,7 @@ Input proc
 		push edi
 		push esi
 		push edx
-		call String_indexOf_2
+		call String_indexOf_2                   ; call String_indexOf_2
 		add esp, 12
 		mov dIndexOf2, eax
 	.elseif dChoice == 15
@@ -532,9 +532,9 @@ Input proc
 		call String_indexOf_3
 		add esp, 8
 		mov dIndexOf3, eax
-	.elseif dChoice == 16
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+	.elseif dChoice == 16                        ; String_lastIndexOf_1 option
+		invoke putstring, addr strSelectPrompt   ; prompt for string choice
+		invoke getstring, addr strChoice, 1      ; get string1 || string2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -543,22 +543,22 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid    ; error if invalid
 			ret
 		.endif
 		
-		invoke putstring, addr strCharPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCharPrompt     ; prompt for char choice
+		invoke getstring, addr strChoice, 1      ; get char from user
 		mov esi, offset strChoice
 
 		push esi
 		push edx
-		call String_lastIndexOf_1
+		call String_lastIndexOf_1                ; call String_lastIndexOf_1
 		add esp, 8
 		mov dLastIndexOf1, eax
-	.elseif dChoice == 17
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+	.elseif dChoice == 17                        ; String_lastIndexOf_2 option
+		invoke putstring, addr strSelectPrompt   ; prompt for string choice
+		invoke getstring, addr strChoice, 1      ; get string1 || string2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -567,12 +567,12 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid    ; error if invalid
 			ret
 		.endif
 		
-		invoke putstring, addr strCharPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strCharPrompt     ; prompt from char choice
+		invoke getstring, addr strChoice, 1      ; get char from user
 		invoke putstring, addr strCrlf
 		mov esi, offset strChoice
 		
@@ -585,28 +585,28 @@ Input proc
 		push edi
 		push esi
 		push edx
-		call String_lastIndexOf_2
+		call String_lastIndexOf_2                ; call String_lastIndexOf_2
 		add esp, 12
 		mov dLastIndexOf2, eax
 	.elseif dChoice == 18
-		mov edx, offset string1
-		mov edi, offset string2
-		push edi
-		push edx
-		call String_lastIndexOf_3
+		mov edx, offset string1                  ; get string1
+		mov edi, offset string2                  ; get string2
+		push edi                                 ; do not prompt for choice, push string1
+		push edx                                 ; do not prompt for choice, push string2
+		call String_lastIndexOf_3                ; call String_lastIndexOf_3
 		add esp, 8
 		mov dLastIndexOf3, eax
 	.elseif dChoice == 19
-		mov edx, offset string1
-		mov esi, offset string2
-		push esi
-		push edx
-		call String_concat
+		mov edx, offset string1                  ; get string1
+		mov esi, offset string2                  ; get string2
+		push esi                                 ; do not prompt for choice, push string2
+		push edx                                 ; do not prompt for choice, push string1
+		call String_concat                       ; call String_concat
 		add esp, 8
 		mov dConcatAddress, eax
 	.elseif dChoice == 20
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strSelectPrompt   ; prompt for string choice
+		invoke getstring, addr strChoice, 1      ; get string1 || string2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 
@@ -615,28 +615,28 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid    ; error if invalid
 			ret
 		.endif
 		
-		invoke putstring, addr strCharRep1Prompt
-		invoke getstring, addr strOldChar, 1
+		invoke putstring, addr strCharRep1Prompt ; prompt for old char choice
+		invoke getstring, addr strOldChar, 1     ; get old char from user
 		invoke putstring, addr strCrlf
 		mov esi, offset strOldChar
 		
-		invoke putstring, addr strCharRep2Prompt
-		invoke getstring, addr strNewChar, 1
+		invoke putstring, addr strCharRep2Prompt ; prompt for new char choice
+		invoke getstring, addr strNewChar, 1     ; get new char from user
 		invoke putstring, addr strCrlf
 		mov edi, offset strNewChar
 
 		push edi
 		push esi
 		push edx
-		call String_replace
+		call String_replace                      ; call String_replace
 		add esp, 12
 	.elseif dChoice == 21
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strSelectPrompt   ; prompt for string choice
+		invoke getstring, addr strChoice, 1      ; get string1 || string2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -645,16 +645,16 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid    ; error if invalid
 			ret
 		.endif
 
 		push edx
-		call String_toLowerCase
+		call String_toLowerCase                  ; call String_toLowerCase
 		add esp, 4
 	.elseif dChoice == 22
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
+		invoke putstring, addr strSelectPrompt   ; prompt for string choice
+		invoke getstring, addr strChoice, 1      ; get string1 || string2
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
 		
@@ -663,14 +663,14 @@ Input proc
 		.elseif eax == 2
 			mov edx, offset string2
 		.else
-			invoke putstring, addr strInvalid
+			invoke putstring, addr strInvalid    ; error if invalid
 			ret
 		.endif
 
 		push edx
-		call String_toUpperCase
+		call String_toUpperCase                  ; call String_toUpperCase
 		add esp, 4
-	.elseif dChoice == 23
+	.elseif dChoice == 23                        ; return if user chooses 23
 		ret
 	.else
 
