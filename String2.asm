@@ -1,9 +1,9 @@
 ;**********************************************************************
-; Program:	String2.asm                               
-; Name:		Neal Hitzfield                     
-; Class:	CS3B                               
-; Date:		April 17, 2018                            
-; Purpose:  Define String operations for MASM3        
+; Program:  String2.asm
+; Name:     Neal Hitzfield
+; Class:    CS3B
+; Date:     April 17, 2018
+; Purpose:  Define String operations for MASM3
 ;***********************************************************************
 
 .486
@@ -27,15 +27,15 @@ String_indexOf_1 proc, string1: ptr byte, char: ptr byte
     mov esi, string1             ; get address of string1
     mov edi, char                ; get address of char
 
-    xor eax, eax                 ; clear index-save count
+    mov eax, -1                  ; have eax return -1 if index not found
     xor ebx, ebx                 ; clear index count
     .while byte ptr [esi] != 0   ; while not null
         mov dl, byte ptr [esi]   ; get a char from string1
         mov dh, byte ptr [edi]   ; get the char to compare to
         .if dl == dh             ; if they are equal
-        mov eax, ebx             ; save the index value
-        ret                      ; return, we have found the first occurrence
-        .endif                   ; 
+            mov eax, ebx         ; save the index value
+            ret                  ; return, we have found the first occurrence
+        .endif 
         inc esi                  ; otherwise increment to next char
         inc ebx                  ; increment index counter
     .endw
@@ -52,28 +52,30 @@ String_indexOf_2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
     push string1
     call String_length           ; get length of source string
     add esp, 4
-	
+
     .if fromIndex > eax || fromIndex < 0 ; check if the parameter index is out of bounds
         mov eax, -1             ; if out of bounds, return -1
         ret
     .endif
-	
+
     mov esi, string1             ; get address of string1
     add esi, fromIndex           ; add to that address the index to start searching from
     mov edi, char                ; get address of char to find
-	
-    xor eax, eax                 ; clear index-save count
+
+    mov eax, -1                  ; have eax return -1 if index not found
     xor ebx, ebx                 ; clear index count
     .while byte ptr [esi] != 0   ; while string1 not null
         mov dl, byte ptr [esi]   ; get a char from string1
         mov dh, byte ptr [edi]   ; get the char to compare to
         .if dl == dh             ; if equal
             mov eax, ebx         ; save the index count
+			add eax, fromIndex   ; add start index to final result
             ret                  ; return, we have found the first occurrence
 		.endif
 		inc esi                  ; otherwise increment to next char 
 		inc ebx                  ; increment index counter
 	.endw
+
 	ret                          ; index is in eax
 String_indexOf_2 endp
 
@@ -86,8 +88,8 @@ String_indexOf_3 proc, string1: ptr byte, string2: ptr byte
     mov edi, string2                        ; store other string's address in edi
     xor ebx, ebx                            ; clear string1 index counter
     xor ecx, ecx                            ; clear substring index counter
-    xor eax, eax                            ; clear return value
-	
+    mov eax, -1                             ; have eax return -1 if index not found
+
     .while byte ptr [esi] != 0              ; while string1 not null
         mov dl, byte ptr [edi]              ; get a char from strOther
         mov dh, byte ptr [esi]              ; get a char from string1

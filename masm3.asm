@@ -81,7 +81,6 @@ strNewChar          byte    2 dup (?)
 strCharSearch       byte    2 dup (?)
 strSearchIndex      byte    2 dup (?)
 strLastIndex        byte    2 dup (?)
-strSubstrIndex      byte    11 dup (?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FORMATTING ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strCrlf				byte	13,10,0
@@ -526,24 +525,8 @@ Input proc
 		add esp, 12
 		mov dIndexOf2, eax
 	.elseif dChoice == 15
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		
-		.if eax == 1
-			mov edx, offset string1
-		.elseif eax == 2
-			mov edx, offset string2
-		.else
-			invoke putstring, addr strInvalid
-			ret
-		.endif
-		
-		invoke putstring, addr strStringPrompt
-		invoke getstring, addr strSubstrIndex, 10
-        mov edi, offset strSubstrIndex
-
+		mov edx, offset string1
+        mov edi, offset string2
 		push edi
 		push edx
 		call String_indexOf_3
@@ -606,49 +589,16 @@ Input proc
 		add esp, 12
 		mov dLastIndexOf2, eax
 	.elseif dChoice == 18
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		
-		.if eax == 1
-			mov edx, offset string1
-		.elseif eax == 2
-			mov edx, offset string2
-		.else
-			invoke putstring, addr strInvalid
-			ret
-		.endif
-		
-		invoke putstring, addr strStringPrompt
-		invoke getstring, addr strChoice, 10
-		mov edi, offset strChoice
-
+		mov edx, offset string1
+		mov edi, offset string2
 		push edi
 		push edx
 		call String_lastIndexOf_3
 		add esp, 8
 		mov dLastIndexOf3, eax
 	.elseif dChoice == 19
-		invoke putstring, addr strSelectPrompt
-		invoke getstring, addr strChoice, 1
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		
-		.if eax == 1
-			mov edx, offset string1
-		.elseif eax == 2
-			mov edx, offset string2
-		.else
-			invoke putstring, addr strInvalid
-			ret
-		.endif
-		
-		invoke putstring, addr strConcatPrompt
-		invoke getstring, addr strChoice, 11
-		invoke putstring, addr strCrlf
-		mov esi, offset strChoice
-
+		mov edx, offset string1
+		mov esi, offset string2
 		push esi
 		push edx
 		call String_concat
@@ -659,7 +609,7 @@ Input proc
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
 		invoke ascint32, addr strChoice
-		
+
 		.if eax == 1
 			mov edx, offset string1
 		.elseif eax == 2
