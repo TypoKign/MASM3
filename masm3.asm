@@ -75,6 +75,13 @@ strCharPrompt       byte    "Enter the character to search for: ",0
 strStringPrompt     byte    "Enter the string to search for: ",0
 strCharRep1Prompt   byte    "Enter the character you want to replace: ",0
 strCharRep2Prompt   byte    "Enter the character you want to replace it with: ",0
+strConcatPrompt     byte    "Enter the string to append: ",0
+strOldChar          byte    2 dup (?)
+strNewChar          byte    2 dup (?)
+strCharSearch       byte    2 dup (?)
+strSearchIndex      byte    2 dup (?)
+strLastIndex        byte    2 dup (?)
+strSubstrIndex      byte    11 dup (?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FORMATTING ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 strCrlf				byte	13,10,0
@@ -502,15 +509,14 @@ Input proc
 		.endif
 		
 		invoke putstring, addr strCharPrompt
-		invoke getstring, addr strChoice, 1
+		invoke getstring, addr strCharSearch, 1
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strCharSearch
 		
 		invoke putstring, addr strBeginIndex
-		invoke getstring, addr strChoice, 11
+		invoke getstring, addr strSearchIndex, 2
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
+		invoke ascint32, addr strSearchIndex
 		mov edi, eax
 
 		push edi
@@ -535,12 +541,10 @@ Input proc
 		.endif
 		
 		invoke putstring, addr strStringPrompt
-		invoke getstring, addr strChoice, 11
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		invoke getstring, addr strSubstrIndex, 10
+        mov edi, offset strSubstrIndex
 
-		push esi
+		push edi
 		push edx
 		call String_indexOf_3
 		add esp, 8
@@ -562,9 +566,7 @@ Input proc
 		
 		invoke putstring, addr strCharPrompt
 		invoke getstring, addr strChoice, 1
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strChoice
 
 		push esi
 		push edx
@@ -589,14 +591,13 @@ Input proc
 		invoke putstring, addr strCharPrompt
 		invoke getstring, addr strChoice, 1
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strChoice
 		
-		invoke putstring, addr strBeginIndex
-		invoke getstring, addr strChoice, 11
+		invoke putstring, addr strBeginIndex     ; prompt for beginning index
+		invoke getstring, addr strLastIndex, 2   ; only allow two digits to be entered
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov edi, eax
+		invoke ascint32, addr strLastIndex       ; convert to int
+        mov edi, eax
 
 		push edi
 		push esi
@@ -620,12 +621,10 @@ Input proc
 		.endif
 		
 		invoke putstring, addr strStringPrompt
-		invoke getstring, addr strChoice, 11
-		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		invoke getstring, addr strChoice, 10
+		mov edi, offset strChoice
 
-		push esi
+		push edi
 		push edx
 		call String_lastIndexOf_3
 		add esp, 8
@@ -645,11 +644,10 @@ Input proc
 			ret
 		.endif
 		
-		invoke putstring, addr strStringPrompt
+		invoke putstring, addr strConcatPrompt
 		invoke getstring, addr strChoice, 11
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strChoice
 
 		push esi
 		push edx
@@ -672,16 +670,14 @@ Input proc
 		.endif
 		
 		invoke putstring, addr strCharRep1Prompt
-		invoke getstring, addr strChoice, 1
+		invoke getstring, addr strOldChar, 1
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov esi, eax
+		mov esi, offset strOldChar
 		
 		invoke putstring, addr strCharRep2Prompt
-		invoke getstring, addr strChoice, 1
+		invoke getstring, addr strNewChar, 1
 		invoke putstring, addr strCrlf
-		invoke ascint32, addr strChoice
-		mov edi, eax
+		mov edi, offset strNewChar
 
 		push edi
 		push esi

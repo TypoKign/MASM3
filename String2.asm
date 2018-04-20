@@ -48,7 +48,7 @@ String_indexOf_2 proc, string1: ptr byte, char: ptr byte, fromIndex: dword
 	add esp, 4
 	
 	.if fromIndex > eax || fromIndex < 0 ; check if the parameter index is out of bounds
-		mov eax, 666              ; if out of bounds, return -1
+		mov eax, -1             ; if out of bounds, return -1
 		ret
 	.endif
 	
